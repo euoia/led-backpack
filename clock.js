@@ -33,6 +33,7 @@ console.log('Clock starting...');
 // writing to the display does not error.
 setTimeout(function startClock() {
 	"use strict";
+	ledbackpack.init();
 	ledbackpack.clear();
 	ledbackpack.enableColon();
 	ledbackpack.setBrightness(ledbackpack.MAX_BRIGHTNESS);
