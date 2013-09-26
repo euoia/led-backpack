@@ -16,7 +16,7 @@ function zeroFill(number, width) {
 	return number + "";
 }
 
-function readTemp(callback) {
+var readTemp = exports.readTemp = function readTemp(callback) {
 	"use strict";
 
 	fs.readFile(tempDevice, function (err, buffer) {
