@@ -60,11 +60,18 @@ function drawTemp() {
 
 		console.log(tempRecord);
 
-		// Get whole degrees with leading zeros.
-		var wholeDegrees = zeroFill(Math.floor(tempRecord.celsius), 2);
+		// Round to 2 decimal places.
+		// After, we are guaranteed to have a number of the form xxxxxx.xx
+		var temp = parseFloat(tempRecord.celsius).toFixed(2);
 
-		// Get first 2 decimal places.
-		var twoDecimalPlaces = zeroFill(Math.floor((tempRecord.celsius % 1) * 100), 2);
+		// Get whole degrees with leading zeros.
+		var tempPieces = temp.split('.');
+
+		// Add any leading zeros to the temperature.
+		var wholeDegrees = zeroFill(tempPieces[0], 2);
+
+		// The first two decimal places are everything after the period.
+		var twoDecimalPlaces = tempPieces[1];
 
 		ledbackpack.setDigit(0, wholeDegrees.charAt(0));
 		ledbackpack.setDigit(1, wholeDegrees.charAt(1));
