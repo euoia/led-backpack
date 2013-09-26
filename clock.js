@@ -10,7 +10,7 @@ function zeroFill(number, width) {
 	}
 
 	 // always return a string.
-	return number + "";
+	return String(number);
 }
 
 
@@ -33,6 +33,7 @@ console.log('Clock starting...');
 // writing to the display does not error.
 setTimeout(function startClock() {
 	"use strict";
+	ledbackpack.clear();
 	ledbackpack.enableColon();
 	ledbackpack.setBrightness(ledbackpack.MAX_BRIGHTNESS);
 	ledbackpack.setBlinkRate(ledbackpack.BLINKRATE_OFF);
