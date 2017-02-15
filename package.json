@@ -1,6 +1,6 @@
 {
-  "name": "node-rasp2c-temp",
-  "version": "0.0.1",
+  "name": "rasp2c",
+  "version": "1.0.0",
   "description": "LED Backpack control using rasp2c.",
   "main": "index.js",
   "scripts": {
