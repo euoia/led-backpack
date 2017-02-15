@@ -1,7 +1,20 @@
 var ledbackpack = require('./lib/ledbackpack.js'),
 	fs = require('fs');
 
-var tempDevice = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
+var tempDevice   = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
+
+// The interval to read and redraw the display.
+// Can override this.
+var readDrawInterval = exports.readDrawInterval = 1000;
+
+var lastGoodTemp = null;
+
+// Get the last good reading. Can be retrieved by the client code.
+var getLastGoodTemp = exports.getLastGoodTemp = function() {
+	console.log('retrieving lastGoodTemp, which is ' + lastGoodTemp);
+	return lastGoodTemp;
+};
+
 
 // Credit: http://stackoverflow.com/questions/1267283/how-can-i-create-a-zerofilled-value-using-javascript
 function zeroFill(number, width) {
@@ -19,10 +32,14 @@ function zeroFill(number, width) {
 var readTemp = exports.readTemp = function readTemp(callback) {
 	"use strict";
 
+	console.log("starting to read tempDevice");
 	fs.readFile(tempDevice, function (err, buffer) {
 		if (err) {
+			// should actually use the callback.
 			throw (err);
 		}
+
+		console.log("got response from tempDevice");
 
 		// Read data from file (using fast node ASCII encoding).
 		var data = buffer.toString('ascii').split(" "); // Split by space.
@@ -33,21 +50,38 @@ var readTemp = exports.readTemp = function readTemp(callback) {
 		// Round to one decimal place.
 		var rounded_temp = Math.round(temp * 10) / 10;
 
+		var has_error = false;
 		if (rounded_temp === -0.1) {
 			console.error('Probably an erroneous reading! Temperature sensor said -0.1. Ignoring this record.');
-			return callback('sensor fail');
+			has_error = true;
 		}
 
-		// Add date/time to temperature.
-		var record = {
-			unix_time: Date.now(),
-			celsius: temp
-		};
+		if (rounded_temp < -20 || rounded_temp > 100) {
+			console.error('Probably an erroneous reading! Temperature sensor said ' + rounded_temp + '. Ignoring this record.');
+			has_error = true;
+		}
+
+		var record;
+		if (has_error) {
+			console.log('Returning last good temperature (' + lastGoodTemp + ').');
+
+			record = {
+				unix_time: Date.now(),
+				celsius: lastGoodTemp
+			};
+		} else {
+			record = {
+				unix_time: Date.now(),
+				celsius: temp
+			};
+
+			lastGoodTemp = temp;
+		}
 
 		// Execute call back with data.
-		callback(null, record);
+		return callback(null, record);
 	});
-}
+};
 
 function drawTemp() {
 	"use strict";
@@ -83,17 +117,13 @@ function drawTemp() {
 
 console.log('Temp sensor starting...');
 
-// Put the init stuff on a timeout. Seems to take some milliseconds before
-// writing to the display does not error.
-setTimeout(function startClock() {
-	"use strict";
-
-	ledbackpack.init();
+ledbackpack.init(function initSuccess() {
 	ledbackpack.clear();
 	ledbackpack.enableColon();
 	ledbackpack.setBrightness(ledbackpack.MAX_BRIGHTNESS);
 	ledbackpack.setBlinkRate(ledbackpack.BLINKRATE_OFF);
 
-	setInterval(drawTemp, 1000);
+	console.log("Refreshing display at " + readDrawInterval + " intervals.");
+	setInterval(drawTemp, readDrawInterval);
 	console.log('Temp sensor started.');
-}, 1000);
+});

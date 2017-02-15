@@ -10,6 +10,6 @@
   "author": "",
   "license": "BSD",
   "dependencies": {
-    "rasp2c": "0.0.1"
+    "rasp2c": "git://github.com/euoia/node-rasp2c"
   }
 }
