@@ -11,5 +11,8 @@
   "license": "BSD",
   "dependencies": {
     "rasp2c": "git://github.com/euoia/node-rasp2c"
+  },
+  "devDependencies": {
+    "eslint": "^3.15.0"
   }
 }
