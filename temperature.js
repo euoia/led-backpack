@@ -1,4 +1,4 @@
-var ledbackpack = require('./lib/ledbackpack.js'),
+var ledbackpack = require('./ledbackpack.js'),
   fs = require('fs');
 
 var tempDevice   = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';

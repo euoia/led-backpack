@@ -1,4 +1,4 @@
-var ledbackpack = require('./lib/ledbackpack.js');
+var ledbackpack = require('./ledbackpack.js');
 
 // Credit: http://stackoverflow.com/questions/1267283/how-can-i-create-a-zerofilled-value-using-javascript
 function zeroFill(number, width) {
