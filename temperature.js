@@ -1,18 +1,18 @@
 var ledBackpack = require('./led-backpack.js'),
   fs = require('fs');
 
-var tempDevice   = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
+const temperatureDevice = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
 
 // The interval to read and redraw the display.
 // Can override this.
-var readDrawInterval = exports.readDrawInterval = 1000;
+const readDrawInterval = exports.readDrawInterval = 1000;
 
-var lastGoodTemp = null;
+var lastGoodTemperature = null;
 
 // Get the last good reading. Can be retrieved by the client code.
-var getLastGoodTemp = exports.getLastGoodTemp = function() {
-  console.log('retrieving lastGoodTemp, which is ' + lastGoodTemp);
-  return lastGoodTemp;
+const getLastGoodTemperature = exports.getLastGoodTemperature = () => {
+  console.log('retrieving lastGoodTemperature which is ' + lastGoodTemperature);
+  return lastGoodTemperature
 };
 
 
@@ -29,83 +29,83 @@ function zeroFill(number, width) {
   return number + "";
 }
 
-var readTemp = exports.readTemp = function readTemp(callback) {
+const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
   "use strict";
 
-  console.log("starting to read tempDevice");
-  fs.readFile(tempDevice, function (err, buffer) {
+  console.log("starting to read temperatureDevice");
+  fs.readFile(temperatureDevice, function (err, buffer) {
     if (err) {
       // should actually use the callback.
       throw (err);
     }
 
-    console.log("got response from tempDevice");
+    console.log("got response from temperatureDevice");
 
     // Read data from file (using fast node ASCII encoding).
     var data = buffer.toString('ascii').split(" "); // Split by space.
 
     // Extract temperature from string and divide by 1000 to give celsius.
-    var temp = parseFloat(data[data.length - 1].split("=")[1]) / 1000.0;
+    var temperature = parseFloat(data[data.length - 1].split("=")[1]) / 1000.0;
 
     // Round to one decimal place.
-    var rounded_temp = Math.round(temp * 10) / 10;
+    var rounded_temperature = Math.round(temperature * 10) / 10;
 
     var has_error = false;
-    if (rounded_temp === -0.1) {
+    if (rounded_temperature === -0.1) {
       console.error('Probably an erroneous reading! Temperature sensor said -0.1. Ignoring this record.');
       has_error = true;
     }
 
-    if (rounded_temp < -20 || rounded_temp > 100) {
-      console.error('Probably an erroneous reading! Temperature sensor said ' + rounded_temp + '. Ignoring this record.');
+    if (rounded_temperature < -20 || rounded_temperature > 100) {
+      console.error('Probably an erroneous reading! Temperature sensor said ' + rounded_temperature + '. Ignoring this record.');
       has_error = true;
     }
 
     var record;
     if (has_error) {
-      console.log('Returning last good temperature (' + lastGoodTemp + ').');
+      console.log('Returning last good temperature (' + lastGoodTemperature+ ').');
 
       record = {
         unix_time: Date.now(),
-        celsius: lastGoodTemp
+        celsius: lastGoodTemperature
       };
     } else {
       record = {
         unix_time: Date.now(),
-        celsius: temp
+        celsius: temperature
       };
 
-      lastGoodTemp = temp;
+      lastGoodTemperature= temperature;
     }
 
     // Execute call back with data.
-    return callback(null, record);
+    return readTemperatureCallback(null, record);
   });
 };
 
-function drawTemp() {
+function drawTemperature() {
   "use strict";
 
-  readTemp(function (err, tempRecord) {
+  readTemperature(function (err, temperatureRecord) {
     if (err) {
       console.log('Not using erroneous reading.');
       return;
     }
 
-    console.log(tempRecord);
+    console.log(temperatureRecord);
 
     // Round to 2 decimal places.
     // After, we are guaranteed to have a number of the form xxxxxx.xx
-    var temp = parseFloat(tempRecord.celsius).toFixed(2);
+    var temperature = parseFloat(temperatureRecord.celsius).toFixed(2);
 
     // Get whole degrees with leading zeros.
-    var tempPieces = temp.split('.');
+    var temperaturePieces = temperature.split('.');
 
     // Add any leading zeros to the temperature.
-    var wholeDegrees = zeroFill(tempPieces[0], 2);
+    var wholeDegrees = zeroFill(temperaturePieces[0], 2);
 
     // The first two decimal places are everything after the period.
-    var twoDecimalPlaces = tempPieces[1];
+    var twoDecimalPlaces = temperaturePieces[1];
 
     ledBackpack.setDigit(0, wholeDegrees.charAt(0));
     ledBackpack.setDigit(1, wholeDegrees.charAt(1));
@@ -115,7 +115,7 @@ function drawTemp() {
   });
 }
 
-console.log('Temp sensor starting...');
+console.log('Temperature sensor starting...');
 
 ledBackpack.init(function initSuccess() {
   ledBackpack.clear();
@@ -124,6 +124,6 @@ ledBackpack.init(function initSuccess() {
   ledBackpack.setBlinkRate(ledBackpack.BLINKRATE_OFF);
 
   console.log("Refreshing display at " + readDrawInterval + " intervals.");
-  setInterval(drawTemp, readDrawInterval);
-  console.log('Temp sensor started.');
+  setInterval(drawTemperature, readDrawInterval);
+  console.log('Temperature sensor started.');
 });
