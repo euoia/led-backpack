@@ -1,4 +1,4 @@
-var ledbackpack = require('./ledbackpack.js'),
+var ledBackpack = require('./led-backpack.js'),
   fs = require('fs');
 
 var tempDevice   = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
@@ -107,21 +107,21 @@ function drawTemp() {
     // The first two decimal places are everything after the period.
     var twoDecimalPlaces = tempPieces[1];
 
-    ledbackpack.setDigit(0, wholeDegrees.charAt(0));
-    ledbackpack.setDigit(1, wholeDegrees.charAt(1));
+    ledBackpack.setDigit(0, wholeDegrees.charAt(0));
+    ledBackpack.setDigit(1, wholeDegrees.charAt(1));
 
-    ledbackpack.setDigit(3, String(twoDecimalPlaces).charAt(0));
-    ledbackpack.setDigit(4, String(twoDecimalPlaces).charAt(1));
+    ledBackpack.setDigit(3, String(twoDecimalPlaces).charAt(0));
+    ledBackpack.setDigit(4, String(twoDecimalPlaces).charAt(1));
   });
 }
 
 console.log('Temp sensor starting...');
 
-ledbackpack.init(function initSuccess() {
-  ledbackpack.clear();
-  ledbackpack.enableColon();
-  ledbackpack.setBrightness(ledbackpack.MAX_BRIGHTNESS);
-  ledbackpack.setBlinkRate(ledbackpack.BLINKRATE_OFF);
+ledBackpack.init(function initSuccess() {
+  ledBackpack.clear();
+  ledBackpack.enableColon();
+  ledBackpack.setBrightness(ledBackpack.MAX_BRIGHTNESS);
+  ledBackpack.setBlinkRate(ledBackpack.BLINKRATE_OFF);
 
   console.log("Refreshing display at " + readDrawInterval + " intervals.");
   setInterval(drawTemp, readDrawInterval);
