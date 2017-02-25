@@ -1,16 +1,13 @@
-var ledBackpack = require('./led-backpack.js'),
-  fs = require('fs');
+const ledBackpack = require('./led-backpack.js');
+const fs = require('fs');
+const debug = require('debug')('led-backpack');
 
 const temperatureDevice = '/sys/bus/w1/devices/28-0000043a7cce/w1_slave';
-
-// The interval to read and redraw the display.
-// Can override this.
-const readDrawInterval = exports.readDrawInterval = 1000;
 
 var lastGoodTemperature = null;
 
 // Get the last good reading. Can be retrieved by the client code.
-const getLastGoodTemperature = exports.getLastGoodTemperature = () => {
+exports.getLastGoodTemperature = () => {
   return lastGoodTemperature
 };
 
@@ -28,13 +25,13 @@ function zeroFill(number, width) {
   return number + "";
 }
 
-const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
-  "use strict";
+const readTemperature = exports.readTemperature = (readTemperatureCallback = function () {}) => {
 
   fs.readFile(temperatureDevice, function (err, buffer) {
     if (err) {
+      debug('Error reading from temperature device.');
       // should actually use the callback.
-      throw (err);
+      return readTemperatureCallback (err.stack);
     }
 
     // Read data from file (using fast node ASCII encoding).
@@ -48,18 +45,18 @@ const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
 
     var has_error = false;
     if (rounded_temperature === -0.1) {
-      console.error('Probably an erroneous reading! Temperature sensor said -0.1. Ignoring this record.');
+      debug('Probably an erroneous reading! Temperature sensor said -0.1. Ignoring this record.');
       has_error = true;
     }
 
     if (rounded_temperature < -20 || rounded_temperature > 100) {
-      console.error('Probably an erroneous reading! Temperature sensor said ' + rounded_temperature + '. Ignoring this record.');
+      debug('Probably an erroneous reading! Temperature sensor said ' + rounded_temperature + '. Ignoring this record.');
       has_error = true;
     }
 
     var record;
     if (has_error) {
-      console.log('Returning last good temperature (' + lastGoodTemperature+ ').');
+      debug('Returning last good temperature (' + lastGoodTemperature+ ').');
 
       record = {
         unix_time: Date.now(),
@@ -71,7 +68,7 @@ const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
         celsius: temperature
       };
 
-      lastGoodTemperature= temperature;
+      lastGoodTemperature = temperature;
     }
 
     // Execute call back with data.
@@ -79,12 +76,17 @@ const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
   });
 };
 
-function drawTemperature() {
+/**
+ * Read and display the current temperature.
+ *
+ * Store the temperature as lastGoodTemperature.
+ */
+function refreshTemperature() {
   "use strict";
 
   readTemperature(function (err, temperatureRecord) {
     if (err) {
-      console.log('Not using erroneous reading.');
+      debug('Not using erroneous reading.');
       return;
     }
 
@@ -109,15 +111,14 @@ function drawTemperature() {
   });
 }
 
-console.log('Temperature sensor starting...');
+exports.init = (options = {}) => {
+  const refreshInterval = options.refreshInterval || 1000;
 
-ledBackpack.init(function initSuccess() {
   ledBackpack.clear();
   ledBackpack.enableColon();
   ledBackpack.setBrightness(ledBackpack.MAX_BRIGHTNESS);
   ledBackpack.setBlinkRate(ledBackpack.BLINKRATE_OFF);
+  readTemperature();
 
-  console.log("Refreshing display at " + readDrawInterval + " intervals.");
-  setInterval(drawTemperature, readDrawInterval);
-  console.log('Temperature sensor started.');
-});
+  setInterval(refreshTemperature, refreshInterval);
+};

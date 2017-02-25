@@ -72,7 +72,7 @@ var setRawAddress = function (address, rawValue) {
 
   rasp2c.set(display_address, address, rawValue, function (err, result) {
     if (err) {
-      throw (err);
+      throw (err.stack);
     }
   });
 };
