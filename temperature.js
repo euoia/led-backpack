@@ -11,7 +11,6 @@ var lastGoodTemperature = null;
 
 // Get the last good reading. Can be retrieved by the client code.
 const getLastGoodTemperature = exports.getLastGoodTemperature = () => {
-  console.log('retrieving lastGoodTemperature which is ' + lastGoodTemperature);
   return lastGoodTemperature
 };
 
@@ -32,14 +31,11 @@ function zeroFill(number, width) {
 const readTemperature = exports.readTemperature = (readTemperatureCallback) => {
   "use strict";
 
-  console.log("starting to read temperatureDevice");
   fs.readFile(temperatureDevice, function (err, buffer) {
     if (err) {
       // should actually use the callback.
       throw (err);
     }
-
-    console.log("got response from temperatureDevice");
 
     // Read data from file (using fast node ASCII encoding).
     var data = buffer.toString('ascii').split(" "); // Split by space.
