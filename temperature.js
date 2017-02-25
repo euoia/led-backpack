@@ -88,8 +88,6 @@ function drawTemperature() {
       return;
     }
 
-    console.log(temperatureRecord);
-
     // Round to 2 decimal places.
     // After, we are guaranteed to have a number of the form xxxxxx.xx
     var temperature = parseFloat(temperatureRecord.celsius).toFixed(2);
