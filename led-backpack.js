@@ -25,8 +25,6 @@ var HT16K33_BLINKRATE_1HZ    = 0x02;
 var HT16K33_BLINKRATE_HALFHZ = 0x03;
 
 var clear = function () {
-  "use strict";
-
   addresses.forEach(function (address) {
     rasp2c.set(display_address, address, '0x00', function (err, result) {
       if (err) {
@@ -38,8 +36,6 @@ var clear = function () {
 
 // Set digit at to value.
 var setDigit = function (pos, digit) {
-  "use strict";
-
   if (isNaN(digit)) {
     console.log("Not attempting to set invalid digit '" + digit + "'");
     return;
@@ -56,8 +52,6 @@ var setDigit = function (pos, digit) {
 
 // Set digit at pos to value.
 var setRaw = function (pos, rawValue) {
-  "use strict";
-
   rasp2c.set(display_address, addresses[pos], rawValue, function (err, result) {
     if (err) {
       console.error('Error in setRaw with pos=' + pos + ' and rawValue=' + rawValue);
@@ -68,8 +62,6 @@ var setRaw = function (pos, rawValue) {
 
 // Set digit at address to value.
 var setRawAddress = function (address, rawValue) {
-  "use strict";
-
   rasp2c.set(display_address, address, rawValue, function (err, result) {
     if (err) {
       throw (err.stack);
@@ -80,8 +72,6 @@ var setRawAddress = function (address, rawValue) {
 
 // Enable the colon character.
 function enableColon() {
-  "use strict";
-
   // The colon character is at position index 2.
   rasp2c.set(display_address, addresses[2], '0x02', function (err, result) {
     if (err) {
@@ -92,8 +82,6 @@ function enableColon() {
 
 // Disable the colon character.
 function disableColon() {
-  "use strict";
-
   // The colon character is at position index 2.
   rasp2c.set(display_address, addresses[2], 0, function (err, result) {
     if (err) {
@@ -104,8 +92,6 @@ function disableColon() {
 
 // Sets the brightness level from 0 to 15.
 var setBrightness = function (brightness) {
-  "use strict";
-
   if (brightness > 15) {
     brightness = 15;
   }
@@ -115,8 +101,6 @@ var setBrightness = function (brightness) {
 
 // Sets the blink rate.
 var setBlinkRate = function (blinkRate) {
-  "use strict";
-
   if (blinkRate > HT16K33_BLINKRATE_HALFHZ) {
     blinkRate = HT16K33_BLINKRATE_OFF;
   }
@@ -125,12 +109,10 @@ var setBlinkRate = function (blinkRate) {
 };
 
 // Sends the system setup message.
-var init = exports.init = function (success) {
-  "use strict";
-
-  rasp2c.init(function initSuccess() {
+exports.init = function (callback) {
+  rasp2c.init(() => {
     setRawAddress(HT16K33_REGISTER_SYSTEM_SETUP | 0x01, 0x00);
-    success();
+    callback(null);
   });
 }
 
