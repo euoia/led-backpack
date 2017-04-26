@@ -1,13 +1,17 @@
 {
-    "env": {
-      "es6": true,
-      "amd": true,
-      "commonjs": true,
-      "node": true
-    },
-    "ecmaFeatures": {
-      "modules": true,
-      "experimentalObjectRestSpread": true
-    },
-    "extends": "eslint:recommended"
+  "rules": {
+    "no-console": 0,
+    "no-unused-vars": ["error", { "args": "none" }]
+  },
+  "env": {
+    "es6": true,
+    "amd": true,
+    "commonjs": true,
+    "node": true
+  },
+  "ecmaFeatures": {
+    "modules": true,
+    "experimentalObjectRestSpread": true
+  },
+  "extends": "eslint:recommended"
 }
