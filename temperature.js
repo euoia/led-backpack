@@ -3,8 +3,6 @@ const debug = require('debug')('led-backpack/temperature');
 
 // Credit: http://stackoverflow.com/questions/1267283/how-can-i-create-a-zerofilled-value-using-javascript
 function zeroFill(number, width) {
-  "use strict";
-
   width -= number.toString().length;
   if (width > 0) {
     return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
@@ -23,8 +21,6 @@ function zeroFill(number, width) {
  * point number.
  */
 exports.displayTemperature = (temperatureCelsius) => {
-  "use strict";
-
   debug(`Displaying temperature ${temperatureCelsius}`);
 
   // Round to 2 decimal places.
@@ -47,13 +43,16 @@ exports.displayTemperature = (temperatureCelsius) => {
   ledBackpack.setDigit(4, String(twoDecimalPlaces).charAt(1));
 }
 
-exports.init = () => {
-  ledBackpack.clear();
+exports.init = (callback) => {
+  ledBackpack.init(() => {
+    ledBackpack.clear();
 
-  // We don't actually want a colon - we want a decimal place, but there's no
-  // way to independently control that dot so you'll have to put a piece of
-  // blu-tack over it.
-  ledBackpack.enableColon();
-  ledBackpack.setBrightness(ledBackpack.MAX_BRIGHTNESS);
-  ledBackpack.setBlinkRate(ledBackpack.BLINKRATE_OFF);
+    // We don't actually want a colon - we want a decimal place, but there's no
+    // way to independently control that dot so you'll have to put a piece of
+    // blu-tack over it.
+    ledBackpack.enableColon();
+    ledBackpack.setBrightness(ledBackpack.MAX_BRIGHTNESS);
+    ledBackpack.setBlinkRate(ledBackpack.BLINKRATE_OFF);
+    callback(null);
+  });
 };
