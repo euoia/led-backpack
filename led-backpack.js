@@ -41,7 +41,6 @@ var setDigit = function (pos, digit) {
     return;
   }
 
-
   rasp2c.set(display_address, addresses[pos], digits[digit], function (err, result) {
     if (err) {
       console.error('Error in setDigit with pos=' + pos + ' and digit=' + digit);
