@@ -1,4 +1,4 @@
-var rasp2c = require('rasp2c');
+var rasp2c = require('@euoia/rasp2c');
 
 // i2c address of the 7-segment display.
 // You can find this by running:
