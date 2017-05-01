@@ -1,5 +1,5 @@
 {
-  "name": "led-backpack",
+  "name": "@euoia/led-backpack",
   "version": "1.0.0",
   "description": "LED Backpack control using rasp2c.",
   "main": "index.js",
