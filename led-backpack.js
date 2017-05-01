@@ -108,6 +108,7 @@ var setBlinkRate = function (blinkRate) {
 };
 
 // Sends the system setup message.
+// TODO: Require that this is called!
 exports.init = function (callback) {
   rasp2c.init(() => {
     setRawAddress(HT16K33_REGISTER_SYSTEM_SETUP | 0x01, 0x00);
